@@ -38,28 +38,28 @@ class Remont:
         marka.current(0)
         marka.grid(row=1, column=1)
     
-        
+        # Выбор модель машины
         model = Combobox(self.tab, width=45)
         model = Combobox(self.tab, postcommand=lambda: self.updtcblist(model, marka), width=45)
         model.grid(row=2, column=1)
 
-        
+        # Класс
         class_auto = Combobox(self.tab, width=45)
         class_auto['values'] = self.class_auto_list
         class_auto.current(0)
         class_auto.grid(row=3, column=1)
 
-        
+        # Год
         year = Entry(self.tab)
         year.insert(-1, "2023")
         year.grid(row=4, column=1, sticky="ew")
 
-        
+        # Пробег
         probeg = Entry(self.tab)
         probeg.insert(-1, "0")
         probeg.grid(row=5, column=1, sticky="ew")
 
-        
+        # Вид работы
         vid = Combobox(self.tab, width=45)
         vid['values'] = ['Малярные', 'Снятие/Установка', 'Разборка/Сборка', 'Замена']
         vid.current(0)
@@ -71,37 +71,37 @@ class Remont:
         Label(self.tab, text='Время (часы)').grid(row=4, column=2)
         Label(self.tab, text='Норм-час (тг)').grid(row=5, column=2)
 
-        
+        # Часть
         detail_v1 = Combobox(self.tab, width=30)
         detail_v1['values'] = self.car_details_list
         detail_v1.current(0)
         detail_v1.grid(row=1, column=3)
 
-        
+        # Наименование агрегата, узла, детали
         detail_v2 = Combobox(self.tab, width=30)
         detail_v2 = Combobox(self.tab, postcommand=lambda: self.updtcblist_v2(detail_v2, detail_v1), width=30)
         detail_v2.grid(row=2, column=3)
 
-        
+        # Площадь
         plowad = Entry(self.tab)
         plowad.insert(-1, "0")
         plowad.grid(row=3, column=3, sticky="ew")
 
-        
+        # Время
         vremya = Entry(self.tab)
         vremya.insert(-1, "0")
         vremya.grid(row=4, column=3, sticky="ew")
 
-        
+        # Норм часы
         norm_chas = Entry(self.tab)
         norm_chas.insert(-1, "0")
         norm_chas.grid(row=5, column=3, sticky="ew")
 
-        
+        # Итог
         itog = Label(self.tab, text='', width=12, fg='green', font=('Arial', 11, 'normal'))
         itog.grid(row=7, column=3, sticky="ew")
 
-        
+        # Кнопка рассчета
         Button(self.tab, text='Посчитать', width=15, command=lambda: self.calculate(
             marka.get(),
             model.get(),
@@ -119,7 +119,7 @@ class Remont:
 
     def calculate(self, marka, model, class_auto, year, probeg, vid, detail_v1, detail_v2, plowad, vremya, norm_chas, itog):
 
-        
+        # если Норм час = 0, высчитываем сами по классу авто, году и мрп
         if norm_chas == 0:
             norm_chas = get_norm_chas(class_auto, year)
 
@@ -154,12 +154,12 @@ class Remont:
         currentYear = datetime.now().year
         srok = currentYear - year
 
-        
+        # Find coeeficients
         info = get_a_b_L0_ML(marka)
         coeff_a_out = float(info["coeff_a"])
         coeff_b_out = float(info["coeff_b"])
 
-        
+        # Рассчет пробега если он 0
         if probeg == 0:
             Lo_out = float(info["Lo"])
             ML_out = float(info["ML"])
@@ -187,7 +187,7 @@ class Remont:
 
         prices = []
 
-        
+        # Ищем в kolesa.kz
         try:
             search_str = search.lower().strip().replace(' ', '+')
 
@@ -205,7 +205,7 @@ class Remont:
 
             zapchast_price = sum(prices) / len(prices)
 
-            
+            # Если срок авто больше 7 лет
             if (year - datetime.now().year) >= 7:
                 zapchast_price = zapchast_price * (1 - (self.get_fiz_iznos(year, brand, probeg)/100))
 
@@ -214,7 +214,7 @@ class Remont:
             msg = f"{search} {vid.lower()}\nОбщая стоимость\n{round(price)}тг\nс учетом детали"
             return [msg, price, "с учетом детали", host]
 
-        
+        # если мы не находим деталь на сайте
         except:
             msg = f"{search} замена\nОбщая стоимость:\n{round(price)}\nбез учета детали\n(деталь не найдена)"
             return [msg, price, "без учета детали"]

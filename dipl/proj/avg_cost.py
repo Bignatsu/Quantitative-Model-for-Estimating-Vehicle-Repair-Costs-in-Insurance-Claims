@@ -27,7 +27,7 @@ class Avg_cost:
         self.sweel_type = 'Слева'
         self.privod_type = 'Передний'
 
-        
+        # kolesa, mycar, aster
         self.fuel = {'бензин': [1, 9],
                      'дизель': [2, 10],
                      'гибрид': [5, 11],
@@ -47,32 +47,32 @@ class Avg_cost:
         model['values'] = print_models(marka.get())
 
     def start(self):
-        
+        # Выбор марки машин
         Label(self.tab, text='Марка', width=14).grid(row=0)
         marka = Combobox(self.tab, width=45)
         marka['values'] = self.cars
         marka.current(0)
         marka.grid(row=0, column=1)
 
-        
+        # модель
         Label(self.tab, text='Модель', width=14).grid(row=1)
         model = Combobox(self.tab, postcommand=lambda: self.updtcblist(model, marka), width=45)
         model.grid(row=1, column=1)
 
-        
+        # Год
         Label(self.tab, text='Год', width=14).grid(row=2)
         year = Entry(self.tab)
         year.insert(-1, "2023")
         year.grid(row=2, column=1, sticky="ew")
 
-        
+        # Тип двигателя
         Label(self.tab, text='Тип двигателя', width=14).grid(row=3)
         fuel = Combobox(self.tab, width=45)
         fuel['values'] = list(self.fuel.keys())
         fuel.current(0)
         fuel.grid(row=3, column=1)
 
-        
+        # Коробка
         Label(self.tab, text='Коробка', width=14).grid(row=4)
         kpp = Combobox(self.tab, width=45)
         kpp['values'] = list(self.car_transm.keys())
@@ -101,11 +101,11 @@ class Avg_cost:
         miles.insert(-1, "0")
         miles.grid(row=8, column=1, sticky="ew")
 
-        
+        # Итого
         itog = Label(self.tab, text='', width=14, fg='green', font=('Arial', 11, 'normal'))
         itog.grid(row=10, column=0)
 
-        
+        # Кнопка рассчета
         Button(self.tab, text='Посчитать', width=10, command=lambda: self.calculate_avg_cost(
             float(miles.get()),
             float(volume.get()),
