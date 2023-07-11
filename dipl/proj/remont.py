@@ -7,7 +7,7 @@ from datetime import datetime
 from tkinter.ttk import Combobox
 from proj.data import get_marks_models, print_models, get_class_auto, get_car_details, get_material_price, \
     get_norm_chas, get_a_b_L0_ML, data_to_excel, close_excel
-
+import statistics
 
 class Remont:
     
@@ -197,13 +197,16 @@ class Remont:
             soup1 = BeautifulSoup(request1.text, 'html.parser')
 
             for i in soup1.find_all(class_='a-card__title'):
-                request2 = requests.get('https://kolesa.kz' + i.find('a', class_='a-card__link')['href'])  # item_link
-                soup2 = BeautifulSoup(request2.text, 'html.parser')
+                try:
+                    request2 = requests.get('https://kolesa.kz' + i.find('a', class_='a-card__link')['href'])  # item_link
+                    soup2 = BeautifulSoup(request2.text, 'html.parser')
 
-                p = re.sub("[^0-9]", "", soup2.find('div', class_='offer__price').text)
-                prices.append(int(p))
+                    p = re.sub("[^0-9]", "", soup2.find('div', class_='offer__price').text)
+                    prices.append(int(p))
+                except (ValueError, AttributeError):
+                    continue
 
-            zapchast_price = sum(prices) / len(prices)
+            zapchast_price = statistics.median(prices)
 
             # Если срок авто больше 7 лет
             if (year - datetime.now().year) >= 7:
@@ -217,4 +220,4 @@ class Remont:
         # если мы не находим деталь на сайте
         except:
             msg = f"{search} замена\nОбщая стоимость:\n{round(price)}\nбез учета детали\n(деталь не найдена)"
-            return [msg, price, "без учета детали"]
+            return [msg, price, "без учета детали", host]
