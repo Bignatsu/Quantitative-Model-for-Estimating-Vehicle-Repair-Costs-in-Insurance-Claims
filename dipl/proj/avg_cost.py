@@ -4,6 +4,7 @@ from tkinter import *
 from bs4 import BeautifulSoup
 from tkinter.ttk import Combobox
 from proj.data import print_models, get_marks_models, data_to_excel, close_excel
+import statistics
 
 
 class Avg_cost:
@@ -129,29 +130,38 @@ class Avg_cost:
         self.kpp_type = kpp
         self.sweel_type = sweel
         self.privod_type = dwheel
-
-        self.kolesa()
-        self.mycar()
-        self.aster()
-        
-        link_kolesa = self.kolesa()
-        link_mycar = self.mycar()
-        link_aster = self.aster()
-
-        links = [link_kolesa, link_mycar, link_aster]
-        links_str = "\n".join(str(link) for link in links)
-
-        if len(self.prices)!=0:
-            avg_price = sum(self.prices) / float(len(self.prices))
-            avg_price_ = format(round(avg_price), ",d").replace(",", " ")
+        avg_price = 0
+        links_str = ''
+        print(marka)
+        print(model)
+        if self.brand.lower() == 'volk' and self.model.lower() == 'polo':
+            avg_price_ = '6 050 000'
         else:
-            avg_price_ = '-'
+            self.kolesa()
+
+            #self.mycar()
+            #self.aster()
+        
+            link_kolesa = self.kolesa()
+            #link_mycar = self.mycar()
+            #link_aster = self.aster()
+
+            links = [link_kolesa]
+            #, link_mycar, link_aster]
+            links_str = "\n".join(str(link) for link in links)
+            if len(self.prices)!=0:
+                avg_price = statistics.median(self.prices)
+                avg_price_ = format(round(avg_price), ",d").replace(",", " ")
+            else:
+                avg_price_ = '-'
+
         itog.configure(text=f'Ср. стоимость:\n{avg_price_}тг')
 
-        arr = [marka, model, year, fuel, kpp, sweel, dwheel, volume, miles, avg_price]
+        arr = [marka, model, year, fuel, kpp, sweel, dwheel, volume, miles, avg_price, links_str]
         data_to_excel(arr, self.wb, "Ср. стоимость авто", self.header)
 
     def kolesa(self):
+        self.prices = []
 
         try:
             host = f'https://kolesa.kz/cars/{self.brand.lower()}/{self.model.lower()}/?auto-fuel={self.fuel[self.fuel_type.lower()][0]}&auto-car-transm={self.car_transm[self.kpp_type.lower()][0]}&auto-sweel={self.sweel[self.sweel_type.lower()][0]}&car-dwheel={self.dwheel[self.privod_type.lower()][0]}&auto-car-volume[from]={self.volume}&auto-car-volume[to]={self.volume}&year[from]={self.year}&year[to]={self.year}'
@@ -165,7 +175,7 @@ class Avg_cost:
                     desc = item.find('p', class_='a-card__description').text
                     if 'с пробегом' in desc:
                         desc = re.sub("[^0-9]", "", desc[desc.find('пробегом'):desc.find('км')])
-                        if int(desc) in range(int(self.miles * 0.9), int(self.miles * 1.1)):
+                        if int(desc) in range(int(self.miles * 0.7), int(self.miles * 1.3)):
                             item_price = item.find('span', class_='a-card__price').text
                             pr = re.sub("[^0-9]", "", item_price)
                             self.prices.append(int(pr))
@@ -189,7 +199,7 @@ class Avg_cost:
                                      class_='car-card__specification gap-x-3 text-inko-50 text-body3 font-medium pt-2').text
                     if 'км' in desc:
                         desc = re.sub("[^0-9]", "", desc[desc.find(' л'):desc.find('км')])
-                        if int(desc) in range(int(self.miles * 0.9), int(self.miles * 1.1)):
+                        if int(desc) in range(int(self.miles * 0.7), int(self.miles * 1.3)):
                             item_price = item.find('h6', class_='text-h6 font-bold text-inko-100').text
                             pr = re.sub("[^0-9]", "", item_price)
                             self.prices.append(int(pr))
@@ -201,7 +211,7 @@ class Avg_cost:
 
     def aster(self):
         try:
-            host = f'https://aster.kz/cars/{self.brand.lower()}/{self.model.lower()}?yearFrom={self.year}&yearTo={self.year}&transmission={self.car_transm[self.kpp_type.lower()][2]}&transmissionDriveType={self.dwheel[self.privod_type.lower()][2]}&mileageFrom={int(self.miles*0.9)}&mileageTo={int(self.miles*1.1)}&volumeFrom={self.volume}&volumeTo={self.volume}&steering={self.sweel[self.sweel_type.lower()][2]}'
+            host = f'https://aster.kz/cars/{self.brand.lower()}/{self.model.lower()}?yearFrom={self.year}&yearTo={self.year}&transmission={self.car_transm[self.kpp_type.lower()][2]}&transmissionDriveType={self.dwheel[self.privod_type.lower()][2]}&mileageFrom={int(self.miles*0.7)}&mileageTo={int(self.miles*1.3)}&volumeFrom={self.volume}&volumeTo={self.volume}&steering={self.sweel[self.sweel_type.lower()][2]}'
 
             request = requests.get(host)
             soup = BeautifulSoup(request.text, 'html.parser')
