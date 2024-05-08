@@ -134,26 +134,24 @@ class Avg_cost:
         links_str = ''
         print(marka)
         print(model)
-        if self.brand.lower() == 'volk' and self.model.lower() == 'polo':
-            avg_price_ = '6 050 000'
-        else:
-            self.kolesa()
 
-            #self.mycar()
-            #self.aster()
+        self.kolesa()
+
+        self.mycar()
+        self.aster()
         
-            link_kolesa = self.kolesa()
-            #link_mycar = self.mycar()
-            #link_aster = self.aster()
+        link_kolesa = self.kolesa()
+        link_mycar = self.mycar()
+        link_aster = self.aster()
 
-            links = [link_kolesa]
-            #, link_mycar, link_aster]
-            links_str = "\n".join(str(link) for link in links)
-            if len(self.prices)!=0:
-                avg_price = statistics.median(self.prices)
-                avg_price_ = format(round(avg_price), ",d").replace(",", " ")
-            else:
-                avg_price_ = '-'
+        links = [link_kolesa, link_mycar, link_aster]
+        #, link_mycar, link_aster]
+        links_str = "\n".join(str(link) for link in links)
+        if len(self.prices)!=0:
+            avg_price = statistics.median(self.prices)
+            avg_price_ = format(round(avg_price), ",d").replace(",", " ")
+        else:
+            avg_price_ = '-'
 
         itog.configure(text=f'Ср. стоимость:\n{avg_price_}тг')
 
@@ -181,6 +179,7 @@ class Avg_cost:
                             self.prices.append(int(pr))
                 except (ValueError, AttributeError):
                     continue
+            print('Kolesa', statistics.median(self.prices))
             return host
 
         except ConnectionError:
@@ -205,6 +204,7 @@ class Avg_cost:
                             self.prices.append(int(pr))
                 except (ValueError, AttributeError):
                     continue
+            print('Mycar', statistics.median(self.prices))
             return host
         except ConnectionError:
             pass
@@ -227,6 +227,7 @@ class Avg_cost:
                         continue
             else:
                 pass
+            print('Aster', statistics.median(self.prices))
             return host
         except ConnectionError:
             pass
